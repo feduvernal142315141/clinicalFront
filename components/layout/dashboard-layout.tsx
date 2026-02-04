@@ -1,24 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/contexts/auth-context";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/contexts/auth-context";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
-import { LoginForm } from "@/components/auth/login-form";
+import { AppHeader } from "@/components/layout/app-header";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  activeSection: string;
-  onSectionChange?: (section: string) => void;
+  currentPath: string;
 }
 
 export function DashboardLayout({
   children,
-  activeSection,
-  onSectionChange,
+  currentPath,
 }: DashboardLayoutProps) {
   const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/");
+    }
+  }, [user, loading, router]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -26,13 +32,6 @@ export function DashboardLayout({
 
   const closeSidebar = () => {
     setIsSidebarOpen(false);
-  };
-
-  const handleSectionChange = (section: string) => {
-    if (onSectionChange) {
-      onSectionChange(section);
-    }
-    closeSidebar();
   };
 
   if (loading) {
@@ -47,26 +46,29 @@ export function DashboardLayout({
   }
 
   if (!user) {
-    return <LoginForm />;
+    return null;
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <MobileHeader isSidebarOpen={isSidebarOpen} onToggleSidebar={toggleSidebar} />
+      <MobileHeader
+        isSidebarOpen={isSidebarOpen}
+        onToggleSidebar={toggleSidebar}
+      />
+
+      <AppHeader />
 
       <div className="flex h-screen lg:h-screen">
         <Sidebar
-          activeSection={activeSection}
-          onSectionChange={handleSectionChange}
+          currentPath={currentPath}
           isOpen={isSidebarOpen}
           onClose={closeSidebar}
         />
 
-        <main className="flex-1 p-4 lg:p-6 overflow-auto pt-0 lg:pt-6">
+        <main className="flex-1 p-4 lg:p-6 overflow-auto pt-0 lg:pt-6 rounded-2xl">
           {children}
         </main>
       </div>
     </div>
   );
 }
-

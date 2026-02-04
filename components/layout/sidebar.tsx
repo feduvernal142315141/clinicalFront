@@ -1,129 +1,167 @@
-"use client"
+"use client";
 
-import {useAuth} from "@/contexts/auth-context"
-import {Button} from "@/components/ui/button"
-import {Card} from "@/components/ui/card"
-import {Calendar, Users, Settings, LogOut, Stethoscope, UserCheck, ClipboardList, BookImage, FileText} from "lucide-react"
-import {useEffect} from "react"
-import Link from "next/link"
+import { cn } from "@/lib/utils/utils";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/contexts/auth-context";
+import { useSidebarNavigation } from "@/lib/hooks/use-sidebar-navigation";
+import { ThemeToggle } from "@/components/ui/atomic/controls/theme-toggle";
+import { SidebarHeader } from "@/components/ui/atomic/navigation/sidebar-header";
+import { SidebarSection } from "@/components/ui/atomic/navigation/sidebar-section";
+import { SidebarNavItem } from "@/components/ui/atomic/navigation/sidebar-nav-item";
+import { StorageNotification } from "@/components/ui/atomic/feedback/storage-notification";
+import { Stethoscope, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Button } from "@/components/ui/primitives/shadcn/button";
 
 interface SidebarProps {
-    activeSection: string
-    onSectionChange: (section: string) => void
-    isOpen: boolean
-    onClose: () => void
+  currentPath: string;
+  isOpen: boolean;
+  onClose: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export function Sidebar({activeSection, onSectionChange, isOpen, onClose}: SidebarProps) {
-    const {user, logout} = useAuth()
+export function Sidebar({
+  currentPath,
+  isOpen,
+  onClose,
+  isCollapsed = false,
+  onToggleCollapse,
+}: SidebarProps) {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const { mainMenuItems, secondaryMenuItems, isActiveRoute } =
+    useSidebarNavigation(user?.roleName);
 
-    const getMenuItems = () => {
-        switch (user?.roleName) {
-            case "admin":
-                return [
-                    {id: "dashboard", label: "Dashboard", icon: ClipboardList},
-                    {id: "users", label: "Pacientes", icon: Users},
-                    {id: "appointments", label: "Citas", icon: Calendar},
-                    {id: "settings", label: "Configuración", icon: Settings},
-                ]
-            case "doctor":
-                return [
-                    {id: "dashboard", label: "Dashboard", icon: Stethoscope},
-                    {id: "appointments", label: "Mis Citas", icon: Calendar},
-                    {id: "users", label: "Pacientes", icon: UserCheck},
-                    // { id: "settings", label: "Configuración", icon: Settings },
-                ]
-            case "patient":
-                return [
-                    {id: "dashboard", label: "Dashboard", icon: UserCheck},
-                    {id: "appointments", label: "Mis Citas", icon: Calendar},
-                    {id: "history", label: "Historial", icon: ClipboardList},
-                    // { id: "settings", label: "Configuración", icon: Settings },
-                ]
-            default:
-                return []
-        }
-    }
+  const handleNavigation = (path: string) => {
+    router.push(path);
+    onClose();
+  };
 
-    useEffect(() => {
-        console.log("User role:", user)
-    }, [user])
+  const getUserName = () => {
+    if (!user?.email) return "Usuario";
+    const emailParts = user.email.split(String.fromCharCode(64));
+    return emailParts[0] || "Usuario";
+  };
 
-    const menuItems = getMenuItems()
+  const themeToggle = <ThemeToggle variant="ghost" size="sm" />;
 
-    const handleSectionChange = (section: string) => {
-        onSectionChange(section)
-        onClose()
-    }
+  return (
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
 
-    return (
-        <>
-            {isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={onClose}/>}
-
-            <div
-                className={`
-        fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
-        transform ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0
-        transition-transform duration-300 ease-in-out lg:transition-none
-        w-64 lg:w-64
-      `}
+      {/* Sidebar content */}
+      <div
+        className={cn(
+          "fixed lg:static inset-y-0 left-0 z-50 lg:z-auto",
+          "h-full",
+          "transform transition-all duration-300 ease-in-out lg:transform-none",
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          "flex flex-col",
+          isCollapsed ? "w-20" : "w-64"
+        )}
+      >
+        {/* Header with collapse button */}
+        <div
+          className={cn(
+            "flex items-center py-3 transition-all duration-300",
+            isCollapsed ? "px-2 justify-center" : "px-4 justify-between"
+          )}
+        >
+          {/* Logo and title with animation */}
+          <div
+            className={cn(
+              "flex items-center gap-3 transition-all duration-300 overflow-hidden",
+              isCollapsed ? "w-10 justify-center" : "w-auto"
+            )}
+          >
+            <Stethoscope
+              className={cn(
+                "shrink-0 text-primary transition-all duration-300",
+                isCollapsed ? "h-8 w-8" : "h-6 w-6"
+              )}
+            />
+            <span
+              className={cn(
+                "font-semibold whitespace-nowrap transition-all duration-300",
+                isCollapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
+              )}
             >
-                <Card className="w-full h-full p-4 lg:rounded-lg rounded-none">
-                    <div className="flex flex-col h-full">
-                        <div className="mb-6 hidden lg:block">
-                            <h2 className="text-lg font-semibold text-primary">Sistema Médico</h2>
-                            <p className="text-sm text-muted-foreground">{user?.email}</p>
-                            <p className="text-xs text-muted-foreground capitalize">{user?.roleName}</p>
-                        </div>
+              Sistema Médico
+            </span>
+          </div>
+          {/* Collapse button */}
+          {onToggleCollapse && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleCollapse}
+              className={cn(
+                "shrink-0 h-8 w-8 transition-all duration-300",
+                isCollapsed ? "rotate-0" : "rotate-0"
+              )}
+              aria-label={isCollapsed ? "Expandir sidebar" : "Colapsar sidebar"}
+            >
+              <div className="transition-transform duration-300">
+                {isCollapsed ? (
+                  <ChevronsRight className="h-4 w-4" />
+                ) : (
+                  <ChevronsLeft className="h-4 w-4" />
+                )}
+              </div>
+            </Button>
+          )}
+        </div>
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-4 px-3">
+          <SidebarSection className="space-y-1">
+            {mainMenuItems.map((item) => (
+              <SidebarNavItem
+                key={item.path}
+                icon={item.icon}
+                label={item.label}
+                isActive={isActiveRoute(currentPath, item.path)}
+                onClick={() => handleNavigation(item.path)}
+                isCollapsed={isCollapsed}
+              />
+            ))}
+          </SidebarSection>
 
-                        <nav className="flex-1 space-y-2">
-                            {menuItems.map((item) => {
-                                const Icon = item.icon
-                                return (
-                                    <Button
-                                        key={item.id}
-                                        variant={activeSection === item.id ? "default" : "ghost"}
-                                        className="w-full justify-start"
-                                        onClick={() => handleSectionChange(item.id)}
-                                    >
-                                        <Icon className="mr-2 h-4 w-4"/>
-                                        {item.label}
-                                    </Button>
-                                )
-                            })}
-                            
-                            {/* Links con navegación real para admins */}
-                            {user?.roleName === "admin" && (
-                                <>
-                                    <Link href="/campaigns" onClick={onClose}>
-                                        <Button
-                                            variant={activeSection === "campaigns" ? "default" : "ghost"}
-                                            className="w-full justify-start"
-                                        >
-                                            <BookImage className="mr-2 h-4 w-4"/>
-                                            Campañas
-                                        </Button>
-                                    </Link>
-                                    <Link href="/template-demo" onClick={onClose}>
-                                        <Button
-                                            variant={activeSection === "templates" ? "default" : "ghost"}
-                                            className="w-full justify-start"
-                                        >
-                                            <FileText className="mr-2 h-4 w-4"/>
-                                            Templates
-                                        </Button>
-                                    </Link>
-                                </>
-                            )}
-                        </nav>
+          {secondaryMenuItems.length > 0 && (
+            <SidebarSection separator className="mt-4 pt-4 space-y-1">
+              {secondaryMenuItems.map((item) => (
+                <SidebarNavItem
+                  key={item.path}
+                  icon={item.icon}
+                  label={item.label}
+                  isActive={isActiveRoute(currentPath, item.path)}
+                  onClick={() => handleNavigation(item.path)}
+                  isCollapsed={isCollapsed}
+                />
+              ))}
+            </SidebarSection>
+          )}
+        </nav>
 
-                        <Button variant="outline" className="w-full justify-start mt-4 bg-transparent" onClick={logout}>
-                            <LogOut className="mr-2 h-4 w-4"/>
-                            Cerrar Sesión
-                        </Button>
-                    </div>
-                </Card>
-            </div>
-        </>
-    )
+        {/* Storage notification at bottom - animated hide when collapsed */}
+        <div
+          className={cn(
+            "mt-auto px-3 pb-4 transition-all duration-300 overflow-hidden",
+            isCollapsed ? "opacity-0 max-h-0 py-0" : "opacity-100 max-h-48"
+          )}
+        >
+          <StorageNotification
+            usedPercentage={80}
+            onDismiss={() => console.log("Dismissed")}
+            onUpgrade={() => console.log("Upgrade clicked")}
+          />
+        </div>
+      </div>
+    </>
+  );
 }

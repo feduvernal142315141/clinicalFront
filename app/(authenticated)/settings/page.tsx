@@ -1,8 +1,8 @@
 "use client";
 
-import { SettingsPage } from "@/components/settings/settings-page";
+import { redirect } from "next/navigation";
 
+// Redirect to general settings by default
 export default function SettingsRoute() {
-  return <SettingsPage />;
+  redirect("/settings/general");
 }
-
