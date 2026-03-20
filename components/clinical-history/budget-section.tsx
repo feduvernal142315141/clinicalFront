@@ -1,37 +1,39 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Badge,
+  Input,
+  Label,
+  Textarea,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  ScrollArea,
+  Progress,
+  Separator,
+} from "@/components/ui"
 import {
   Receipt,
   Plus,
@@ -56,7 +58,7 @@ import {
   GripVertical,
 } from "lucide-react"
 import { Budget, TreatmentPlan, DentalTreatment } from "@/lib/clinical-history/types"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/utils"
 
 interface BudgetSectionProps {
   budgets: Budget[]

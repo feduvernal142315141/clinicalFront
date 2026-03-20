@@ -1,23 +1,26 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Button,
+  Badge,
+  ScrollArea,
+  ScrollBar,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui";
 import { Odontogram, type OdontogramValue } from "@/components/odontogram/Odontogram";
 import type { DentalTreatment, TreatmentStatus } from "@/lib/clinical-history/types";
 import {
@@ -38,7 +41,7 @@ interface ClinicalOdontogramProps {
 
 const statusColors: Record<TreatmentStatus, { fill: string; label: string }> = {
   pending: { fill: "#fbbf24", label: "Pendiente" },
-  "in-progress": { fill: "#3b82f6", label: "En Proceso" },
+  in_progress: { fill: "#3b82f6", label: "En Proceso" },
   completed: { fill: "#22c55e", label: "Completado" },
   cancelled: { fill: "#6b7280", label: "Cancelado" },
 };
@@ -61,7 +64,8 @@ export function ClinicalOdontogram({ treatments, onToothSelect }: ClinicalOdonto
   const teethWithTreatments = useMemo(() => {
     const map: Record<string, DentalTreatment[]> = {};
     treatments.forEach((treatment) => {
-      treatment.toothIds.forEach((toothId) => {
+      treatment.toothNumbers.forEach((toothNum) => {
+        const toothId = String(toothNum);
         if (!map[toothId]) map[toothId] = [];
         map[toothId].push(treatment);
       });
@@ -79,7 +83,7 @@ export function ClinicalOdontogram({ treatments, onToothSelect }: ClinicalOdonto
   const highlightedTeeth = useMemo(() => {
     const teeth = new Set<string>();
     filteredTreatments.forEach((t) => {
-      t.toothIds.forEach((id) => teeth.add(id));
+      t.toothNumbers.forEach((num) => teeth.add(String(num)));
     });
     return teeth;
   }, [filteredTreatments]);
@@ -116,7 +120,7 @@ export function ClinicalOdontogram({ treatments, onToothSelect }: ClinicalOdonto
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="pending">Pendientes</SelectItem>
-                <SelectItem value="in-progress">En Proceso</SelectItem>
+                <SelectItem value="in_progress">En Proceso</SelectItem>
                 <SelectItem value="completed">Completados</SelectItem>
               </SelectContent>
             </Select>
@@ -187,7 +191,7 @@ export function ClinicalOdontogram({ treatments, onToothSelect }: ClinicalOdonto
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(teethWithTreatments).map(([toothId, toothTreatments]) => {
                     const isHighlighted = highlightedTeeth.has(toothId);
-                    const hasActive = toothTreatments.some((t) => t.status === "in-progress");
+                    const hasActive = toothTreatments.some((t) => t.status === "in_progress");
                     const hasPending = toothTreatments.some((t) => t.status === "pending");
                     const isSelected = selectedTooth === toothId;
 
@@ -373,7 +377,7 @@ export function ClinicalOdontogram({ treatments, onToothSelect }: ClinicalOdonto
                   </div>
                   <div className="text-center p-3 rounded-lg bg-sky-50 dark:bg-sky-950">
                     <p className="text-2xl font-bold text-sky-600">
-                      {treatments.filter((t) => t.status === "in-progress").length}
+                      {treatments.filter((t) => t.status === "in_progress").length}
                     </p>
                     <p className="text-xs text-sky-600/80">En proceso</p>
                   </div>

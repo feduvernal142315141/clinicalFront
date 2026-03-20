@@ -1,36 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Badge,
+  Button,
+  Input,
+  Label,
+  Textarea,
+  AspectRatio,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui";
 import type { Radiograph } from "@/lib/clinical-history/types";
 import {
   Plus,
@@ -63,7 +66,7 @@ const typeConfig: Record<Radiograph["type"], { label: string; icon: React.Compon
   panoramic: { label: "Panorámica", icon: Image, color: "text-sky-600 bg-sky-100 dark:bg-sky-900/30" },
   periapical: { label: "Periapical", icon: Image, color: "text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30" },
   bitewing: { label: "Bite-wing", icon: Image, color: "text-amber-600 bg-amber-100 dark:bg-amber-900/30" },
-  "clinical-photo": { label: "Foto Clínica", icon: Camera, color: "text-purple-600 bg-purple-100 dark:bg-purple-900/30" },
+  clinical_photo: { label: "Foto Clínica", icon: Camera, color: "text-purple-600 bg-purple-100 dark:bg-purple-900/30" },
   other: { label: "Otro", icon: Image, color: "text-gray-600 bg-gray-100 dark:bg-gray-800" },
 };
 
@@ -78,7 +81,7 @@ export function RadioGraphsSection({ radiographs }: RadioGraphsSectionProps) {
   const filteredRadiographs = radiographs.filter((rad) => {
     const matchesSearch =
       rad.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rad.toothIds?.some((id) => id.includes(searchTerm));
+      rad.toothNumbers?.some((num) => String(num).includes(searchTerm));
 
     const matchesType = typeFilter === "all" || rad.type === typeFilter;
 
@@ -326,16 +329,16 @@ function ImageCard({ radiograph, onClick }: ImageCardProps) {
         >
           {config.label}
         </Badge>
-        {radiograph.toothIds && radiograph.toothIds.length > 0 && (
+        {radiograph.toothNumbers && radiograph.toothNumbers.length > 0 && (
           <div className="absolute top-2 right-2 flex gap-1">
-            {radiograph.toothIds.slice(0, 2).map((id) => (
-              <Badge key={id} variant="secondary" className="font-mono text-xs bg-black/50 text-white">
-                #{id}
+            {radiograph.toothNumbers.slice(0, 2).map((num) => (
+              <Badge key={num} variant="outline" className="font-mono text-xs bg-black/50 text-white">
+                #{num}
               </Badge>
             ))}
-            {radiograph.toothIds.length > 2 && (
-              <Badge variant="secondary" className="text-xs bg-black/50 text-white">
-                +{radiograph.toothIds.length - 2}
+            {radiograph.toothNumbers.length > 2 && (
+              <Badge variant="outline" className="text-xs bg-black/50 text-white">
+                +{radiograph.toothNumbers.length - 2}
               </Badge>
             )}
           </div>
@@ -388,9 +391,9 @@ function ImageListItem({ radiograph, onClick }: ImageListItemProps) {
             <Icon className="h-3 w-3" />
             {config.label}
           </Badge>
-          {radiograph.toothIds && radiograph.toothIds.length > 0 && (
+          {radiograph.toothNumbers && radiograph.toothNumbers.length > 0 && (
             <span className="text-xs text-muted-foreground font-mono">
-              #{radiograph.toothIds.join(", #")}
+              #{radiograph.toothNumbers.join(", #")}
             </span>
           )}
         </div>
@@ -514,7 +517,7 @@ function ImageViewerDialog({
           {/* Navigation Buttons */}
           {hasPrev && (
             <Button
-              variant="secondary"
+              variant="outline"
               size="icon"
               className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full shadow-lg"
               onClick={onPrev}
@@ -524,7 +527,7 @@ function ImageViewerDialog({
           )}
           {hasNext && (
             <Button
-              variant="secondary"
+              variant="outline"
               size="icon"
               className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full shadow-lg"
               onClick={onNext}
@@ -541,11 +544,11 @@ function ImageViewerDialog({
               <p className="font-medium text-foreground">
                 {radiograph.description || "Sin descripción"}
               </p>
-              {radiograph.toothIds && radiograph.toothIds.length > 0 && (
+              {radiograph.toothNumbers && radiograph.toothNumbers.length > 0 && (
                 <div className="flex gap-1 mt-1">
-                  {radiograph.toothIds.map((id) => (
-                    <Badge key={id} variant="outline" className="font-mono text-xs">
-                      #{id}
+                  {radiograph.toothNumbers.map((num) => (
+                    <Badge key={num} variant="outline" className="font-mono text-xs">
+                      #{num}
                     </Badge>
                   ))}
                 </div>

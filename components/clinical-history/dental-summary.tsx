@@ -1,11 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import type { DentalSummary as DentalSummaryType, DentalTreatment, TreatmentStatus } from "@/lib/clinical-history/types";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Badge,
+  Progress,
+  Button,
+  Separator,
+} from "@/components/ui";
+import type { DentalSummaryData, DentalTreatment, TreatmentStatus } from "@/lib/clinical-history/types";
 import {
   Activity,
   Calendar,
@@ -22,14 +28,14 @@ import {
 import { cn } from "@/lib/utils/utils";
 
 interface DentalSummaryProps {
-  summary: DentalSummaryType | null;
+  summary: DentalSummaryData | null;
   treatments: DentalTreatment[];
   onNavigate: (section: string) => void;
 }
 
 const statusConfig: Record<TreatmentStatus, { label: string; color: string; bgColor: string }> = {
   pending: { label: "Pendiente", color: "text-amber-600 dark:text-amber-400", bgColor: "bg-amber-100 dark:bg-amber-900/30" },
-  "in-progress": { label: "En Proceso", color: "text-sky-600 dark:text-sky-400", bgColor: "bg-sky-100 dark:bg-sky-900/30" },
+  in_progress: { label: "En Proceso", color: "text-sky-600 dark:text-sky-400", bgColor: "bg-sky-100 dark:bg-sky-900/30" },
   completed: { label: "Completado", color: "text-emerald-600 dark:text-emerald-400", bgColor: "bg-emerald-100 dark:bg-emerald-900/30" },
   cancelled: { label: "Cancelado", color: "text-gray-500", bgColor: "bg-gray-100 dark:bg-gray-800" },
 };
@@ -39,7 +45,7 @@ export function DentalSummary({ summary, treatments, onNavigate }: DentalSummary
     return <SummarySkeleton />;
   }
 
-  const activeTreatments = treatments.filter((t) => t.status === "in-progress");
+  const activeTreatments = treatments.filter((t) => t.status === "in_progress");
   const pendingTreatments = treatments.filter((t) => t.status === "pending");
   const completedTreatments = treatments.filter((t) => t.status === "completed");
 
@@ -384,9 +390,9 @@ function TreatmentItem({ treatment, compact }: TreatmentItemProps) {
           {treatment.procedure}
         </p>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {treatment.toothIds.length > 0 && (
+          {treatment.toothNumbers.length > 0 && (
             <span className="font-mono">
-              #{treatment.toothIds.join(", #")}
+              #{treatment.toothNumbers.join(", #")}
             </span>
           )}
           <Badge variant="outline" className={cn("text-xs px-1.5 py-0", config.bgColor, config.color)}>

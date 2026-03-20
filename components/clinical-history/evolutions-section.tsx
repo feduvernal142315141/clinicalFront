@@ -1,29 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Badge,
+  Button,
+  Input,
+  Label,
+  Textarea,
+  ScrollArea,
+  Separator,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui";
 import type { ClinicalEvolution, DentalTreatment } from "@/lib/clinical-history/types";
 import {
   Plus,
@@ -500,7 +502,7 @@ function NewEvolutionDialog({ open, onOpenChange, treatments, onSave }: NewEvolu
   const [complications, setComplications] = useState("");
   const [nextIndication, setNextIndication] = useState("");
 
-  const activeTreatments = treatments.filter((t) => t.status === "in-progress" || t.status === "pending");
+  const activeTreatments = treatments.filter((t) => t.status === "in_progress" || t.status === "pending");
 
   const handleSubmit = () => {
     const treatment = treatments.find((t) => t.id === selectedTreatment);
@@ -513,7 +515,7 @@ function NewEvolutionDialog({ open, onOpenChange, treatments, onSave }: NewEvolu
       doctorId: "DOC-001",
       doctorName: "Dr. Carlos Méndez",
       proceduresPerformed: procedures.split("\n").filter(Boolean),
-      teethTreated: treatment?.toothIds || [],
+      teethTreated: treatment?.toothNumbers || [],
       observations,
       complications: complications || undefined,
       nextIndication: nextIndication || undefined,
@@ -556,7 +558,7 @@ function NewEvolutionDialog({ open, onOpenChange, treatments, onSave }: NewEvolu
                 {activeTreatments.map((treatment) => (
                   <SelectItem key={treatment.id} value={treatment.id}>
                     {treatment.procedure}
-                    {treatment.toothIds.length > 0 && ` (${treatment.toothIds.join(", ")})`}
+                    {treatment.toothNumbers.length > 0 && ` (${treatment.toothNumbers.join(", ")})`}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Button,
+  ScrollArea,
+  Separator,
+  Skeleton,
+} from "@/components/ui";
 import { PatientHeader } from "./patient-header";
 import { DentalSummary } from "./dental-summary";
 import { ClinicalOdontogram } from "./clinical-odontogram";
@@ -23,10 +25,10 @@ import type {
   DentalTreatment,
   ClinicalEvolution,
   Radiograph,
-  ClinicalDocument,
+  Document,
   Budget,
   Payment,
-  DentalSummary as DentalSummaryType,
+  DentalSummaryData,
 } from "@/lib/clinical-history/types";
 import {
   LayoutDashboard,
@@ -89,10 +91,10 @@ export function ClinicalHistoryLayout({ patientId, onClose }: ClinicalHistoryLay
   const [treatments, setTreatments] = useState<DentalTreatment[]>([]);
   const [evolutions, setEvolutions] = useState<ClinicalEvolution[]>([]);
   const [radiographs, setRadiographs] = useState<Radiograph[]>([]);
-  const [documents, setDocuments] = useState<ClinicalDocument[]>([]);
-  const [budget, setBudget] = useState<Budget | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [dentalSummary, setDentalSummary] = useState<DentalSummaryType | null>(null);
+  const [dentalSummary, setDentalSummary] = useState<DentalSummaryData | null>(null);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -114,7 +116,7 @@ export function ClinicalHistoryLayout({ patientId, onClose }: ClinicalHistoryLay
         clinicalHistoryService.getEvolutions(patientId),
         clinicalHistoryService.getRadiographs(patientId),
         clinicalHistoryService.getDocuments(patientId),
-        clinicalHistoryService.getBudget(patientId),
+        clinicalHistoryService.getBudgets(patientId),
         clinicalHistoryService.getPayments(patientId),
         clinicalHistoryService.getDentalSummary(patientId),
       ]);
@@ -125,7 +127,7 @@ export function ClinicalHistoryLayout({ patientId, onClose }: ClinicalHistoryLay
       setEvolutions(evolutionsData);
       setRadiographs(radiographsData);
       setDocuments(documentsData);
-      setBudget(budgetData);
+      setBudgets(budgetData);
       setPayments(paymentsData);
       setDentalSummary(summaryData);
     } catch (error) {
@@ -155,7 +157,7 @@ export function ClinicalHistoryLayout({ patientId, onClose }: ClinicalHistoryLay
           <DentalSummary
             summary={dentalSummary}
             treatments={treatments}
-            onNavigate={handleSectionChange}
+            onNavigate={(section) => handleSectionChange(section as ClinicalSection)}
           />
         );
       case "odontogram":
@@ -197,17 +199,13 @@ export function ClinicalHistoryLayout({ patientId, onClose }: ClinicalHistoryLay
         return (
           <DocumentsSection
             documents={documents}
-            onDocumentUpdate={(updated) => {
-              setDocuments((prev) =>
-                prev.map((d) => (d.id === updated.id ? updated : d))
-              );
-            }}
+            patientId={patientId}
           />
         );
       case "budget":
-        return <BudgetSection budget={budget} treatments={treatments} />;
+        return <BudgetSection budgets={budgets} treatmentPlans={[]} treatments={treatments} patientId={patientId} />;
       case "payments":
-        return <PaymentsSection payments={payments} budget={budget} />;
+        return <PaymentsSection payments={payments} budgets={budgets} patientId={patientId} />;
       default:
         return null;
     }

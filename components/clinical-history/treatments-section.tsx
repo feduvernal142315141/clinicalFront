@@ -1,19 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Badge,
+  Button,
+  Input,
+  Progress,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -21,24 +23,23 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Separator,
+} from "@/components/ui";
 import type { DentalTreatment, TreatmentStatus } from "@/lib/clinical-history/types";
 import {
   Plus,
@@ -70,7 +71,7 @@ interface TreatmentsSectionProps {
 
 const statusConfig: Record<TreatmentStatus, { label: string; icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string }> = {
   pending: { label: "Pendiente", icon: Clock, color: "text-amber-600", bgColor: "bg-amber-100 dark:bg-amber-900/30" },
-  "in-progress": { label: "En Proceso", icon: Loader2, color: "text-sky-600", bgColor: "bg-sky-100 dark:bg-sky-900/30" },
+  in_progress: { label: "En Proceso", icon: Loader2, color: "text-sky-600", bgColor: "bg-sky-100 dark:bg-sky-900/30" },
   completed: { label: "Completado", icon: CheckCircle, color: "text-emerald-600", bgColor: "bg-emerald-100 dark:bg-emerald-900/30" },
   cancelled: { label: "Cancelado", icon: XCircle, color: "text-gray-500", bgColor: "bg-gray-100 dark:bg-gray-800" },
 };
@@ -98,7 +99,7 @@ export function TreatmentsSection({ treatments, onTreatmentUpdate }: TreatmentsS
     const matchesSearch =
       treatment.procedure.toLowerCase().includes(searchTerm.toLowerCase()) ||
       treatment.diagnosis.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      treatment.toothIds.some((id) => id.includes(searchTerm));
+      treatment.toothNumbers.some((num) => String(num).includes(searchTerm));
 
     const matchesStatus = statusFilter === "all" || treatment.status === statusFilter;
     const matchesSpecialty = specialtyFilter === "all" || treatment.specialty === specialtyFilter;
@@ -108,7 +109,7 @@ export function TreatmentsSection({ treatments, onTreatmentUpdate }: TreatmentsS
 
   // Group treatments by status
   const groupedByStatus = {
-    "in-progress": filteredTreatments.filter((t) => t.status === "in-progress"),
+    "in_progress": filteredTreatments.filter((t) => t.status === "in_progress"),
     pending: filteredTreatments.filter((t) => t.status === "pending"),
     completed: filteredTreatments.filter((t) => t.status === "completed"),
     cancelled: filteredTreatments.filter((t) => t.status === "cancelled"),
@@ -157,7 +158,7 @@ export function TreatmentsSection({ treatments, onTreatmentUpdate }: TreatmentsS
                 return (
                   <div key={status} className="flex items-center gap-2">
                     <div className={cn("p-1.5 rounded-md", config.bgColor)}>
-                      <Icon className={cn("h-4 w-4", config.color, status === "in-progress" && "animate-spin")} />
+                      <Icon className={cn("h-4 w-4", config.color, status === "in_progress" && "animate-spin")} />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">{count}</p>
@@ -226,14 +227,14 @@ export function TreatmentsSection({ treatments, onTreatmentUpdate }: TreatmentsS
 
         <TabsContent value="cards" className="space-y-6">
           {/* In Progress */}
-          {groupedByStatus["in-progress"].length > 0 && (
+          {groupedByStatus["in_progress"].length > 0 && (
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <Loader2 className="h-4 w-4 text-sky-600 animate-spin" />
-                En Proceso ({groupedByStatus["in-progress"].length})
+                En Proceso ({groupedByStatus["in_progress"].length})
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {groupedByStatus["in-progress"].map((treatment) => (
+                {groupedByStatus["in_progress"].map((treatment) => (
                   <TreatmentCard
                     key={treatment.id}
                     treatment={treatment}
@@ -322,8 +323,8 @@ export function TreatmentsSection({ treatments, onTreatmentUpdate }: TreatmentsS
                       return (
                         <TableRow key={treatment.id}>
                           <TableCell className="font-mono">
-                            {treatment.toothIds.length > 0
-                              ? `#${treatment.toothIds.join(", #")}`
+                            {treatment.toothNumbers.length > 0
+                              ? `#${treatment.toothNumbers.join(", #")}`
                               : "-"}
                           </TableCell>
                           <TableCell className="font-medium">{treatment.procedure}</TableCell>
@@ -333,7 +334,7 @@ export function TreatmentsSection({ treatments, onTreatmentUpdate }: TreatmentsS
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline" className={cn("gap-1", config.bgColor, config.color)}>
-                              <Icon className={cn("h-3 w-3", treatment.status === "in-progress" && "animate-spin")} />
+                              <Icon className={cn("h-3 w-3", treatment.status === "in_progress" && "animate-spin")} />
                               {config.label}
                             </Badge>
                           </TableCell>
@@ -356,7 +357,7 @@ export function TreatmentsSection({ treatments, onTreatmentUpdate }: TreatmentsS
                                   Editar
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => handleStatusChange(treatment, "in-progress")}>
+                                <DropdownMenuItem onClick={() => handleStatusChange(treatment, "in_progress")}>
                                   Iniciar Tratamiento
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleStatusChange(treatment, "completed")}>
@@ -410,9 +411,9 @@ function TreatmentCard({ treatment, onStatusChange, onSelect }: TreatmentCardPro
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold text-foreground">{treatment.procedure}</h3>
-                {treatment.toothIds.length > 0 && (
+                {treatment.toothNumbers.length > 0 && (
                   <Badge variant="outline" className="font-mono text-xs">
-                    #{treatment.toothIds.join(", #")}
+                    #{treatment.toothNumbers.join(", #")}
                   </Badge>
                 )}
               </div>
@@ -422,7 +423,7 @@ function TreatmentCard({ treatment, onStatusChange, onSelect }: TreatmentCardPro
             </div>
           </div>
           <Badge variant="outline" className={cn("gap-1 shrink-0", config.bgColor, config.color)}>
-            <Icon className={cn("h-3 w-3", treatment.status === "in-progress" && "animate-spin")} />
+            <Icon className={cn("h-3 w-3", treatment.status === "in_progress" && "animate-spin")} />
             {config.label}
           </Badge>
         </div>
@@ -502,17 +503,17 @@ function TreatmentDetailDialog({ treatment, onClose, onStatusChange }: Treatment
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Estado</span>
             <Badge variant="outline" className={cn("gap-1", config.bgColor, config.color)}>
-              <Icon className={cn("h-3 w-3", treatment.status === "in-progress" && "animate-spin")} />
+              <Icon className={cn("h-3 w-3", treatment.status === "in_progress" && "animate-spin")} />
               {config.label}
             </Badge>
           </div>
 
           {/* Teeth */}
-          {treatment.toothIds.length > 0 && (
+          {treatment.toothNumbers.length > 0 && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Piezas</span>
               <div className="flex gap-1">
-                {treatment.toothIds.map((id) => (
+                {treatment.toothNumbers.map((id) => (
                   <Badge key={id} variant="outline" className="font-mono">
                     #{id}
                   </Badge>
@@ -559,11 +560,11 @@ function TreatmentDetailDialog({ treatment, onClose, onStatusChange }: Treatment
 
         <DialogFooter className="gap-2">
           {treatment.status === "pending" && (
-            <Button onClick={() => onStatusChange(treatment, "in-progress")}>
+            <Button onClick={() => onStatusChange(treatment, "in_progress")}>
               Iniciar Tratamiento
             </Button>
           )}
-          {treatment.status === "in-progress" && (
+          {treatment.status === "in_progress" && (
             <Button onClick={() => onStatusChange(treatment, "completed")}>
               Marcar Completado
             </Button>

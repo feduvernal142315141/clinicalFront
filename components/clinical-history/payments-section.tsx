@@ -1,20 +1,23 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Badge,
+  Button,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
+  Input,
+  ScrollArea,
+  Progress,
+  Separator,
+} from "@/components/ui"
 import {
   CreditCard,
   Banknote,
@@ -40,9 +43,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui"
 import { Payment, Budget } from "@/lib/clinical-history/types"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/utils"
 
 interface PaymentsSectionProps {
   payments: Payment[]
